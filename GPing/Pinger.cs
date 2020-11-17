@@ -6,16 +6,11 @@ namespace GPing
 {
     public class Pinger
     {
-        public static void Start(string host, MainWindow MainWindow)
+        public static PingReply Start(string host)
         {
             if (string.IsNullOrEmpty(host))
             {
                 throw new ArgumentException($"Item '{nameof(host)}' can't be empty or null", nameof(host));
-            }
-
-            if (MainWindow is null)
-            {
-                throw new ArgumentNullException(nameof(MainWindow));
             }
 
             Ping pingSender = new Ping();
@@ -31,8 +26,10 @@ namespace GPing
 
             if (reply.Status == IPStatus.Success)
             {
-                MainWindow.Draw(reply);
+                return reply;
             }
+
+            return null;
         }
     }
 }
