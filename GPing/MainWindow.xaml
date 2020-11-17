@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Button x:Name="StartButton" Content="START" HorizontalAlignment="Left" Margin="591,10,0,0" VerticalAlignment="Top" Width="150" Click="StartButton_Click"/>
+        <CheckBox Content="CheckBox" HorizontalAlignment="Left" Margin="1104,259,0,0" VerticalAlignment="Top"/>
+        <Canvas x:Name="chartCanvas" Margin="10,75,10,10" Background="#FF1E252C" />
 
     </Grid>
 </Window>
