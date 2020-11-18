@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
         <Button x:Name="StartButton" Content="START" HorizontalAlignment="Left" Margin="221,0,0,0" VerticalAlignment="Center" Width="150" Click="StartButton_Click" Foreground="#FF64E20C" Background="#FF1E252C" Grid.Column="3"/>
         <CheckBox Content="CheckBox" HorizontalAlignment="Left" Margin="697,207,0,0" VerticalAlignment="Top" Grid.Row="1" Grid.Column="3"/>
-        <Canvas x:Name="chartCanvas" Margin="-8,23,73,10" Background="#FF1E252C" Grid.Row="1" Grid.ColumnSpan="4"/>
+        <Canvas x:Name="chartCanvas" Margin="-8,23,73,10" Background="#FF1E252C" Grid.Row="1" Grid.ColumnSpan="4" MouseDown="chartCanvas_MouseEnter"/>
         <Button x:Name="StopButton" Content="STOP" HorizontalAlignment="Left" Margin="221,0,0,0" VerticalAlignment="Center" Width="150" Click="StopButton_Click" Foreground="#FF64E20C" Background="#FF1E252C" Grid.Column="3"/>
         <Label x:Name="lblAdressIp" Content="Pinging facebook.com" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Background="Transparent" Foreground="#FF64E20C" Visibility="Hidden" Grid.ColumnSpan="2"/>
         <Label x:Name="lblMinValue" Content="min 4.531ms" HorizontalAlignment="Left" Margin="124,0,0,0" VerticalAlignment="Center" Foreground="#FF64E20C" Visibility="Hidden" Grid.Column="1"/>
@@ -27,7 +27,7 @@
         <Label x:Name="lblAvgValue" Content="avg 10.421ms" HorizontalAlignment="Left" Margin="95,0,0,0" VerticalAlignment="Center" Foreground="#FF64E20C" Visibility="Hidden" Grid.Column="3"/>
         <TextBox x:Name="tbIpAddress" HorizontalAlignment="Left" Margin="95,0,0,0" Text="Host name or IP" TextWrapping="Wrap" VerticalAlignment="Center" Width="112" Foreground="#FF64E20C" Background="#FF1E252C" GotFocus="tbIpAddress_GotFocus" KeyDown="OnKeyDownHandler" Height="20" Grid.Column="3"/>
         <Canvas x:Name="graphCanvas" Margin="320,23,0,10" Grid.Row="1" Grid.Column="3"/>
-        <Canvas x:Name="bgCanvas" Grid.ColumnSpan="4" Margin="0,23,73,10" Grid.Row="1"/>
+        <Canvas x:Name="bgCanvas" Grid.ColumnSpan="4" Margin="0,23,73,10" Grid.Row="1" Panel.ZIndex="2"/>
 
     </Grid>
 </Window>

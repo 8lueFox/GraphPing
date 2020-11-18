@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace GPing
@@ -16,12 +17,16 @@ namespace GPing
         private Thread thread;
         private long minValue, maxValue, sum;
         private double avgValue;
+        private Label chartPointInfoLabel;
 
         public string Host { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
+            chartPointInfoLabel = new Label();
+            chartPointInfoLabel.Background = Brushes.White;
+            chartPointInfoLabel.Foreground = Brushes.Black;
             StopButton.Visibility = Visibility.Hidden;
             lblAdressIp.Visibility = Visibility.Hidden;
             lblAvgValue.Visibility = Visibility.Hidden;
@@ -97,6 +102,23 @@ namespace GPing
             }
         }
 
+        // wyswietlanie informacji w danej pozycji 
+        private void chartCanvas_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Point p = Mouse.GetPosition(chartCanvas);
+            Color colorAtPoint = GetPixelColor(chartCanvas, p);
+            if (colorAtPoint.ToString().Equals("#2FFFADFF"))
+            {
+                chartPointInfoLabel.Content = $"RTT = {(graphCanvas.ActualHeight - p.Y) / 5} ms";
+                chartPointInfoLabel.Margin = new Thickness(p.X, p.Y - 20, 200, 200);
+                chartCanvas.Children.Add(chartPointInfoLabel);
+            }
+            else
+            {
+                chartCanvas.Children.Remove(chartPointInfoLabel);
+            }
+        }
+
         private void Pinging()
         {
             int countOfPing = 1;
@@ -126,7 +148,7 @@ namespace GPing
 
                     this.Dispatcher.Invoke(() =>
                     {
-                        NewLine(4 * countOfPing, 4 * countOfPing++ + 4, lastPosition, canvasHeight - (Convert.ToInt32(reply.RoundtripTime) * 5), Brushes.GreenYellow, chartCanvas);
+                        NewLine(4 * countOfPing, 4 * countOfPing++ + 4, lastPosition, canvasHeight - (Convert.ToInt32(reply.RoundtripTime) * 5), Brushes.GreenYellow, chartCanvas, 2);
                         lblMinValue.Content = $"min {minValue}ms";
                         lblMaxValue.Content = $"max {maxValue}ms";
                         lblAvgValue.Content = $"avg {avgValue}ms";
@@ -139,7 +161,7 @@ namespace GPing
 
                     lastPosition = canvasHeight - (Convert.ToInt32(reply.RoundtripTime) * 5);
 
-                    Thread.Sleep(100);
+                    Thread.Sleep(250);
                 }
             }
         }
@@ -192,6 +214,53 @@ namespace GPing
                     NewLine(i * 10, i * 10 + 10, Convert.ToInt32(graphCanvas.ActualHeight - (j * 5)), Convert.ToInt32(graphCanvas.ActualHeight - (j * 5)), Brushes.Gray, bgCanvas, 1);
                 }
             }
+        }
+
+        public static Color GetPixelColor(Visual visual, Point pt)
+        {
+            Point ptDpi = getScreenDPI(visual);
+
+            Size srcSize = VisualTreeHelper.GetDescendantBounds(visual).Size;
+
+            //Viewbox uses values between 0 & 1 so normalize the Rect with respect to the visual's Height & Width
+            Rect percentSrcRec = new Rect(pt.X / srcSize.Width, pt.Y / srcSize.Height,
+                                          1 / srcSize.Width, 1 / srcSize.Height);
+
+            //var bmpOut = new RenderTargetBitmap(1, 1, 96d, 96d, PixelFormats.Pbgra32); //assumes 96 dpi
+            var bmpOut = new RenderTargetBitmap((int)(ptDpi.X / 96d),
+                                                (int)(ptDpi.Y / 96d),
+                                                ptDpi.X, ptDpi.Y, PixelFormats.Default); //generalized for monitors with different dpi
+
+            DrawingVisual dv = new DrawingVisual();
+            using (DrawingContext dc = dv.RenderOpen())
+            {
+                dc.DrawRectangle(new VisualBrush { Visual = visual, Viewbox = percentSrcRec },
+                                 null, //no Pen
+                                 new Rect(0, 0, 1d, 1d));
+            }
+            bmpOut.Render(dv);
+
+            var bytes = new byte[4];
+            int iStride = 4; // = 4 * bmpOut.Width (for 32 bit graphics with 4 bytes per pixel -- 4 * 8 bits per byte = 32)
+            bmpOut.CopyPixels(bytes, iStride, 0);
+
+            return Color.FromArgb(bytes[0], bytes[1], bytes[2], bytes[3]);
+        }
+
+        public static Point getScreenDPI(Visual v)
+        {
+            //System.Windows.SystemParameters
+            PresentationSource source = PresentationSource.FromVisual(v);
+            Point ptDpi;
+            if (source != null)
+            {
+                ptDpi = new Point(96.0 * source.CompositionTarget.TransformToDevice.M11,
+                                   96.0 * source.CompositionTarget.TransformToDevice.M22);
+            }
+            else
+                ptDpi = new Point(96d, 96d); //default value.
+
+            return ptDpi;
         }
 
         public void InvokeStartButton()
