@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GPing
 {
-    public class Pinger
+    public static class Pinger
     {
         public static PingReply Start(string host)
         {
@@ -21,15 +21,16 @@ namespace GPing
             int timeout = 10000;
 
             PingOptions options = new PingOptions(64, true);
-
-            PingReply reply = pingSender.Send(host, timeout, buffer, options);
-
-            if (reply.Status == IPStatus.Success)
+            PingReply reply = null;
+            try
             {
-                return reply;
+                reply = pingSender.Send(host, timeout, buffer, options);
             }
-
-            return null;
+            catch
+            {
+                throw new PingerException();
+            }
+            return reply;
         }
     }
 }
